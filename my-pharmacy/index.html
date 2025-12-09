@@ -28,22 +28,72 @@
         </div>
             </div>
 
-        <div class="bg-white p-6 rounded-lg shadow-lg h-fit sticky top-6">
+       <div class="bg-white p-6 rounded-lg shadow-lg h-fit sticky top-6">
             <h2 class="text-xl font-bold mb-4 border-b pb-2">🛒 您的購物車</h2>
-            <div id="cart-items" class="space-y-2 mb-4 text-sm text-gray-700">
+            <div id="cart-items" class="space-y-2 mb-4 text-sm text-gray-700 max-h-60 overflow-y-auto">
                 <p class="text-gray-400">目前購物車是空的</p>
             </div>
             
-            <div class="flex justify-between font-bold text-lg mb-6">
+            <div class="flex justify-between font-bold text-lg mb-6 border-t pt-4">
                 <span>總金額：</span>
                 <span id="total-price" class="text-blue-600">$0</span>
             </div>
 
-            <form id="order-form" class="space-y-3">
-                <input type="text" placeholder="您的姓名" required class="w-full p-2 border rounded">
-                <input type="tel" placeholder="手機號碼" required class="w-full p-2 border rounded">
-                <textarea placeholder="備註 (例如: 取貨時間)" class="w-full p-2 border rounded"></textarea>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">
+            <form id="order-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">收件人姓名</label>
+                    <input type="text" placeholder="請輸入姓名" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">聯絡電話</label>
+                    <input type="tel" placeholder="請輸入手機號碼" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+
+                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                    <label class="block font-bold text-blue-800 mb-2">📦 請選擇取貨方式</label>
+                    
+                    <div class="space-y-2">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="delivery" value="store" checked onclick="toggleDelivery('store')" class="mr-2 w-4 h-4 text-blue-600">
+                            <span>🏥 藥局店取</span>
+                        </label>
+                        
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="delivery" value="711" onclick="toggleDelivery('711')" class="mr-2 w-4 h-4 text-blue-600">
+                            <span>🏪 7-11 取貨</span>
+                        </label>
+
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="delivery" value="mail" onclick="toggleDelivery('mail')" class="mr-2 w-4 h-4 text-blue-600">
+                            <span>🚚 郵寄宅配</span>
+                        </label>
+                    </div>
+
+                    <div class="mt-3 pt-3 border-t border-blue-200">
+                        
+                        <div id="field-store">
+                            <label class="block text-sm font-bold text-gray-700 mb-1">📅 預計取貨時間</label>
+                            <input type="datetime-local" id="input-store-time" class="w-full p-2 border rounded bg-white">
+                        </div>
+
+                        <div id="field-711" class="hidden">
+                            <label class="block text-sm font-bold text-gray-700 mb-1">🏪 7-11 店名/店號</label>
+                            <input type="text" id="input-711-store" placeholder="例如: 統一門市 (123456)" class="w-full p-2 border rounded bg-white">
+                        </div>
+
+                        <div id="field-mail" class="hidden">
+                            <label class="block text-sm font-bold text-gray-700 mb-1">🏠 完整寄送地址</label>
+                            <input type="text" id="input-mail-address" placeholder="縣市/區/路/號/樓" class="w-full p-2 border rounded bg-white">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">備註 (選填)</label>
+                    <textarea placeholder="其他需求說明..." class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none h-20"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-lg transform active:scale-95">
                     送出預訂單
                 </button>
             </form>
@@ -51,7 +101,7 @@
     </div>
 
     <script>
-        // 1. 設定商品資料 (新增 desc 描述欄位)
+        // 1. 設定商品資料 
         const products = [
             { 
                 id: 1, 
@@ -59,14 +109,14 @@
                 price: 600, 
                 tag: "保健", 
                 image: "images/1.jpg",
-                desc: "含高單位 B1、B6、B12，增強體力，上班族必備。" // ★ 新增描述
+                desc: "含高單位 B1、B6、B12，增強體力，上班族必備。"
             },
             { 
                 id: 2, 
                 name: "醫療用口罩 (50入)", 
                 price: 250, 
                 tag: "防疫", 
-                image: "images/口罩.jpg",
+                image: "images/2.jpg",
                 desc: "三層防護結構，台灣製造，透氣舒適不悶熱。"
             },
             { 
@@ -74,7 +124,7 @@
                 name: "葉黃素膠囊", 
                 price: 1200, 
                 tag: "保健", 
-                image: "images/葉黃素.jpg",
+                image: "images/3.jpg",
                 desc: "游離型葉黃素好吸收，保護晶亮，適合長時間用眼者。"
             },
             { 
@@ -82,7 +132,7 @@
                 name: "酒精噴霧 500ml", 
                 price: 150, 
                 tag: "防疫", 
-                image: "images/酒精.jpg",
+                image: "images/4.jpg",
                 desc: "75% 醫療級酒精，居家環境消毒、手部清潔皆適用。"
             },
             { 
@@ -90,27 +140,46 @@
                 name: "痠痛貼布 (10片)", 
                 price: 300, 
                 tag: "外用", 
-                image: "images/貼布.jpg",
+                image: "images/5.jpg",
                 desc: "添加薄荷精油，清涼舒緩，適用肩頸腰背痠痛。"
             },
         ];
 
         let cart = [];
-        let currentFilter = '全部'; // 目前選中的分類
+        let currentFilter = '全部';
 
-        // 2. 初始化：產生按鈕並顯示商品
+        // 2. 初始化
         document.addEventListener('DOMContentLoaded', () => {
             renderFilterButtons();
-            renderProducts(products); // 一開始顯示全部
+            renderProducts(products);
+            
+            // 設定預設時間為現在 (方便使用者不用從頭選)
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('input-store-time').value = now.toISOString().slice(0, 16);
         });
 
-        // 3. 渲染分類按鈕
+        // 3. 切換取貨方式的顯示邏輯 (新功能)
+        function toggleDelivery(method) {
+            // 先隱藏所有特殊欄位
+            document.getElementById('field-store').classList.add('hidden');
+            document.getElementById('field-711').classList.add('hidden');
+            document.getElementById('field-mail').classList.add('hidden');
+
+            // 根據選擇顯示對應欄位
+            if (method === 'store') {
+                document.getElementById('field-store').classList.remove('hidden');
+            } else if (method === '711') {
+                document.getElementById('field-711').classList.remove('hidden');
+            } else if (method === 'mail') {
+                document.getElementById('field-mail').classList.remove('hidden');
+            }
+        }
+
+        // 4. 渲染分類按鈕
         function renderFilterButtons() {
             const btnContainer = document.getElementById('filter-buttons');
-            
-            // 抓出所有的標籤，並加上 '全部'
             const tags = ['全部', ...new Set(products.map(p => p.tag))];
-
             btnContainer.innerHTML = tags.map(tag => `
                 <button onclick="filterProducts('${tag}')" 
                     class="px-4 py-1 rounded-full text-sm font-bold border transition
@@ -122,51 +191,41 @@
             `).join('');
         }
 
-        // 4. 篩選商品邏輯
+        // 5. 篩選邏輯
         function filterProducts(category) {
             currentFilter = category;
-            renderFilterButtons(); // 重新渲染按鈕(為了更新顏色狀態)
-
-            if (category === '全部') {
-                renderProducts(products);
-            } else {
-                const filtered = products.filter(p => p.tag === category);
-                renderProducts(filtered);
-            }
+            renderFilterButtons();
+            if (category === '全部') renderProducts(products);
+            else renderProducts(products.filter(p => p.tag === category));
         }
 
-        // 5. 渲染商品列表 (新增：顯示描述文字)
+        // 6. 渲染商品
         function renderProducts(list) {
             const productListEl = document.getElementById('product-list');
-            
             if(list.length === 0) {
                 productListEl.innerHTML = '<div class="text-gray-500 text-center py-8">沒有找到相關商品</div>';
                 return;
             }
-
             productListEl.innerHTML = list.map(product => `
                 <div class="bg-white p-4 rounded-lg shadow flex items-start">
                     <div class="flex-shrink-0 mr-4">
                         <img src="${product.image}" alt="${product.name}" class="w-24 h-24 object-cover rounded-md border border-gray-200">
                     </div>
-                    
-                    <div class="flex-grow min-w-0"> <div class="flex justify-between items-start">
+                    <div class="flex-grow min-w-0">
+                        <div class="flex justify-between items-start">
                             <div>
                                 <span class="text-xs font-bold text-blue-600 border border-blue-200 bg-blue-50 px-2 py-0.5 rounded-full mb-1 inline-block">${product.tag}</span>
                                 <h3 class="font-bold text-lg text-gray-800 leading-tight">${product.name}</h3>
                             </div>
                             <p class="text-blue-600 font-bold ml-2 shrink-0">$${product.price}</p>
                         </div>
-                        
                         <p class="text-sm text-gray-500 mt-1 mb-2 leading-snug">${product.desc}</p>
                     </div>
-
                     <div class="flex-shrink-0 ml-3 flex flex-col items-end gap-2">
                         <div class="flex items-center text-sm text-gray-600 bg-gray-100 rounded px-1">
                             <span class="text-xs mr-1">數</span>
                             <input type="number" id="qty-input-${product.id}" value="1" min="1" class="w-8 bg-transparent text-center outline-none font-bold">
                         </div>
-                        
                         <button onclick="addToCart(${product.id})" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-bold shadow-md transition whitespace-nowrap">
                             + 加入
                         </button>
@@ -175,57 +234,36 @@
             `).join('');
         }
 
-        // 6. 加入購物車 (跟之前一樣)
+        // 7. 購物車相關功能
         function addToCart(id) {
             const qtyInput = document.getElementById(`qty-input-${id}`);
             const qty = parseInt(qtyInput.value);
-            
-            if (qty <= 0) {
-                alert("數量至少要為 1 喔！");
-                return;
-            }
-
+            if (qty <= 0) { alert("數量至少要為 1 喔！"); return; }
             const product = products.find(p => p.id === id);
             const existingItem = cart.find(item => item.product.id === id);
-
-            if (existingItem) {
-                existingItem.qty += qty;
-            } else {
-                cart.push({ product: product, qty: qty });
-            }
-
+            if (existingItem) existingItem.qty += qty;
+            else cart.push({ product: product, qty: qty });
             updateCart();
-            qtyInput.value = 1; 
-            
-            // 為了讓使用者有感覺，可以加一個簡單的提示
-            // alert(`已將 ${qty} 個 ${product.name} 加入購物車`); 
+            qtyInput.value = 1;
         }
 
-        // 7. 購物車內修改數量 (跟之前一樣)
         function changeQty(index, change) {
             cart[index].qty += change;
             if (cart[index].qty <= 0) {
-                const confirmDelete = confirm(`確定要移除 ${cart[index].product.name} 嗎？`);
-                if(confirmDelete) {
-                    cart.splice(index, 1);
-                } else {
-                    cart[index].qty = 1;
-                }
+                if(confirm(`確定要移除 ${cart[index].product.name} 嗎？`)) cart.splice(index, 1);
+                else cart[index].qty = 1;
             }
             updateCart();
         }
 
-        // 8. 更新購物車 (跟之前一樣)
         function updateCart() {
             const cartEl = document.getElementById('cart-items');
             const totalEl = document.getElementById('total-price');
-            
             if (cart.length === 0) {
                 cartEl.innerHTML = '<p class="text-gray-400">目前購物車是空的</p>';
                 totalEl.innerText = '$0';
                 return;
             }
-
             cartEl.innerHTML = cart.map((item, index) => `
                 <div class="flex justify-between items-center border-b pb-2 pt-2">
                     <div class="flex-grow">
@@ -237,17 +275,14 @@
                         <span class="w-6 text-center font-bold text-sm">${item.qty}</span>
                         <button onclick="changeQty(${index}, 1)" class="bg-gray-200 w-6 h-6 rounded text-gray-600 hover:bg-gray-300 font-bold flex items-center justify-center">+</button>
                     </div>
-                    <div class="ml-4 font-bold text-blue-600 w-16 text-right">
-                        $${item.product.price * item.qty}
-                    </div>
+                    <div class="ml-4 font-bold text-blue-600 w-16 text-right">$${item.product.price * item.qty}</div>
                 </div>
             `).join('');
-
             const total = cart.reduce((sum, item) => sum + (item.product.price * item.qty), 0);
             totalEl.innerText = '$' + total;
         }
 
-        // 9. 送出表單 (LINE ID 記得改)
+        // 8. 送出表單 (LINE 訊息產生邏輯 - 升級版)
         document.getElementById('order-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -256,37 +291,58 @@
                 return;
             }
 
+            // 取得基本資料
             const name = this.querySelector('input[type="text"]').value;
             const phone = this.querySelector('input[type="tel"]').value;
             const note = this.querySelector('textarea').value;
-            const total = cart.reduce((sum, item) => sum + (item.product.price * item.qty), 0);
+            
+            // 取得取貨方式與對應資料
+            const deliveryMethod = document.querySelector('input[name="delivery"]:checked').value;
+            let deliveryInfo = "";
+            let methodText = "";
 
+            if (deliveryMethod === 'store') {
+                methodText = "🏥 藥局店取";
+                const time = document.getElementById('input-store-time').value.replace('T', ' ');
+                deliveryInfo = `預計取貨：${time}`;
+            } else if (deliveryMethod === '711') {
+                methodText = "🏪 7-11取貨";
+                const storeName = document.getElementById('input-711-store').value;
+                if(!storeName) { alert("請輸入 7-11 店名"); return; }
+                deliveryInfo = `門市名稱：${storeName}`;
+            } else if (deliveryMethod === 'mail') {
+                methodText = "🚚 郵寄宅配";
+                const address = document.getElementById('input-mail-address').value;
+                if(!address) { alert("請輸入寄送地址"); return; }
+                deliveryInfo = `寄送地址：${address}`;
+            }
+
+            // 組合訊息
+            const total = cart.reduce((sum, item) => sum + (item.product.price * item.qty), 0);
             let message = `【新訂單通知】\n`;
             message += `----------------\n`;
             message += `姓名：${name}\n`;
             message += `電話：${phone}\n`;
+            message += `方式：${methodText}\n`;
+            message += `${deliveryInfo}\n`;
             message += `----------------\n`;
             message += `訂購商品：\n`;
-            
             cart.forEach(item => {
                 message += `● ${item.product.name} x ${item.qty} ($${item.product.price * item.qty})\n`;
             });
-
             message += `----------------\n`;
             message += `總金額：$${total}\n`;
-            if(note) {
-                message += `備註：${note}`;
-            }
+            if(note) message += `備註：${note}`;
 
-            // ★★★ 請改這裡 ★★★
-            const lineID = "@000obksn"; 
+            // ★★★ 記得改 LINE ID ★★★
+            const lineID = "@您的ID"; 
             const lineUrl = "https://line.me/R/oaMessage/" + lineID + "/?" + encodeURIComponent(message);
-
             window.location.href = lineUrl;
         });
     </script>
 </body>
 
 </html>
+
 
 
