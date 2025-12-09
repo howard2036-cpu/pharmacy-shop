@@ -18,7 +18,14 @@
 
     <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
         
-        <div class="md:col-span-2 space-y-4" id="product-list">
+        <div class="md:col-span-2 space-y-4">
+            
+            <div id="filter-buttons" class="flex flex-wrap gap-2 mb-4">
+                </div>
+
+            <div id="product-list" class="space-y-4">
+                </div>
+        </div>
             </div>
 
         <div class="bg-white p-6 rounded-lg shadow-lg h-fit sticky top-6">
@@ -44,55 +51,134 @@
     </div>
 
     <script>
-        // 1. 設定商品資料 
-        // (如果您有改過商品名稱或圖片，請在這裡手動更新回來)
+        // 1. 設定商品資料 (新增 desc 描述欄位)
         const products = [
-            { id: 1, name: "綜合維他命 B群", price: 600, tag: "保健", image: "images/1.jpg" },
-            { id: 2, name: "醫療用口罩 (50入)", price: 250, tag: "防疫", image: "images/口罩.jpg" },
-            { id: 3, name: "葉黃素膠囊", price: 1200, tag: "保健", image: "images/葉黃素.jpg" },
-            { id: 4, name: "酒精噴霧 500ml", price: 150, tag: "防疫", image: "images/酒精.jpg" },
-            { id: 5, name: "痠痛貼布 (10片)", price: 300, tag: "外用", image: "images/貼布.jpg" },
+            { 
+                id: 1, 
+                name: "綜合維他命 B群", 
+                price: 600, 
+                tag: "保健", 
+                image: "images/1.jpg",
+                desc: "含高單位 B1、B6、B12，增強體力，上班族必備。" // ★ 新增描述
+            },
+            { 
+                id: 2, 
+                name: "醫療用口罩 (50入)", 
+                price: 250, 
+                tag: "防疫", 
+                image: "images/口罩.jpg",
+                desc: "三層防護結構，台灣製造，透氣舒適不悶熱。"
+            },
+            { 
+                id: 3, 
+                name: "葉黃素膠囊", 
+                price: 1200, 
+                tag: "保健", 
+                image: "images/葉黃素.jpg",
+                desc: "游離型葉黃素好吸收，保護晶亮，適合長時間用眼者。"
+            },
+            { 
+                id: 4, 
+                name: "酒精噴霧 500ml", 
+                price: 150, 
+                tag: "防疫", 
+                image: "images/酒精.jpg",
+                desc: "75% 醫療級酒精，居家環境消毒、手部清潔皆適用。"
+            },
+            { 
+                id: 5, 
+                name: "痠痛貼布 (10片)", 
+                price: 300, 
+                tag: "外用", 
+                image: "images/貼布.jpg",
+                desc: "添加薄荷精油，清涼舒緩，適用肩頸腰背痠痛。"
+            },
         ];
 
-        // 購物車現在會存物件： { product: 商品資料, qty: 數量 }
         let cart = [];
+        let currentFilter = '全部'; // 目前選中的分類
 
-        // 2. 渲染商品列表 (新增：數量選擇框)
-        const productListEl = document.getElementById('product-list');
-        productListEl.innerHTML = ''; 
+        // 2. 初始化：產生按鈕並顯示商品
+        document.addEventListener('DOMContentLoaded', () => {
+            renderFilterButtons();
+            renderProducts(products); // 一開始顯示全部
+        });
 
-        products.forEach(product => {
-            const itemHTML = `
-                <div class="bg-white p-4 rounded-lg shadow flex items-center">
+        // 3. 渲染分類按鈕
+        function renderFilterButtons() {
+            const btnContainer = document.getElementById('filter-buttons');
+            
+            // 抓出所有的標籤，並加上 '全部'
+            const tags = ['全部', ...new Set(products.map(p => p.tag))];
+
+            btnContainer.innerHTML = tags.map(tag => `
+                <button onclick="filterProducts('${tag}')" 
+                    class="px-4 py-1 rounded-full text-sm font-bold border transition
+                    ${tag === currentFilter 
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-md' 
+                        : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}">
+                    ${tag}
+                </button>
+            `).join('');
+        }
+
+        // 4. 篩選商品邏輯
+        function filterProducts(category) {
+            currentFilter = category;
+            renderFilterButtons(); // 重新渲染按鈕(為了更新顏色狀態)
+
+            if (category === '全部') {
+                renderProducts(products);
+            } else {
+                const filtered = products.filter(p => p.tag === category);
+                renderProducts(filtered);
+            }
+        }
+
+        // 5. 渲染商品列表 (新增：顯示描述文字)
+        function renderProducts(list) {
+            const productListEl = document.getElementById('product-list');
+            
+            if(list.length === 0) {
+                productListEl.innerHTML = '<div class="text-gray-500 text-center py-8">沒有找到相關商品</div>';
+                return;
+            }
+
+            productListEl.innerHTML = list.map(product => `
+                <div class="bg-white p-4 rounded-lg shadow flex items-start">
                     <div class="flex-shrink-0 mr-4">
                         <img src="${product.image}" alt="${product.name}" class="w-24 h-24 object-cover rounded-md border border-gray-200">
                     </div>
                     
-                    <div class="flex-grow">
-                        <span class="text-xs font-bold text-white bg-blue-400 px-2 py-1 rounded-full mb-1 inline-block">${product.tag}</span>
-                        <h3 class="font-bold text-lg text-gray-800">${product.name}</h3>
-                        <p class="text-blue-600 font-bold">$${product.price}</p>
-                    </div>
-
-                    <div class="flex-shrink-0 ml-2 flex flex-col items-end gap-2">
-                        <div class="flex items-center text-sm text-gray-600">
-                            數量: <input type="number" id="qty-input-${product.id}" value="1" min="1" class="w-12 border rounded text-center ml-1 p-1">
+                    <div class="flex-grow min-w-0"> <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-xs font-bold text-blue-600 border border-blue-200 bg-blue-50 px-2 py-0.5 rounded-full mb-1 inline-block">${product.tag}</span>
+                                <h3 class="font-bold text-lg text-gray-800 leading-tight">${product.name}</h3>
+                            </div>
+                            <p class="text-blue-600 font-bold ml-2 shrink-0">$${product.price}</p>
                         </div>
                         
-                        <button onclick="addToCart(${product.id})" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-bold shadow-md transition transform active:scale-95">
+                        <p class="text-sm text-gray-500 mt-1 mb-2 leading-snug">${product.desc}</p>
+                    </div>
+
+                    <div class="flex-shrink-0 ml-3 flex flex-col items-end gap-2">
+                        <div class="flex items-center text-sm text-gray-600 bg-gray-100 rounded px-1">
+                            <span class="text-xs mr-1">數</span>
+                            <input type="number" id="qty-input-${product.id}" value="1" min="1" class="w-8 bg-transparent text-center outline-none font-bold">
+                        </div>
+                        
+                        <button onclick="addToCart(${product.id})" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-bold shadow-md transition whitespace-nowrap">
                             + 加入
                         </button>
                     </div>
                 </div>
-            `;
-            productListEl.innerHTML += itemHTML;
-        });
+            `).join('');
+        }
 
-        // 3. 加入購物車功能 (升級版：讀取數量)
+        // 6. 加入購物車 (跟之前一樣)
         function addToCart(id) {
-            // 抓取該商品的數量輸入框的值
             const qtyInput = document.getElementById(`qty-input-${id}`);
-            const qty = parseInt(qtyInput.value); // 轉成數字
+            const qty = parseInt(qtyInput.value);
             
             if (qty <= 0) {
                 alert("數量至少要為 1 喔！");
@@ -100,40 +186,36 @@
             }
 
             const product = products.find(p => p.id === id);
-            
-            // 檢查購物車內是否已經有這個商品
             const existingItem = cart.find(item => item.product.id === id);
 
             if (existingItem) {
-                // 如果已經有了，就增加數量
                 existingItem.qty += qty;
             } else {
-                // 如果沒有，就新增進去
                 cart.push({ product: product, qty: qty });
             }
 
             updateCart();
-            // 重置輸入框為 1，方便下次選購
-            qtyInput.value = 1;
+            qtyInput.value = 1; 
+            
+            // 為了讓使用者有感覺，可以加一個簡單的提示
+            // alert(`已將 ${qty} 個 ${product.name} 加入購物車`); 
         }
 
-        // 4. 購物車內修改數量 (+/- 按鈕邏輯)
+        // 7. 購物車內修改數量 (跟之前一樣)
         function changeQty(index, change) {
             cart[index].qty += change;
-
-            // 如果數量變成 0 或更少，就移除該商品
             if (cart[index].qty <= 0) {
                 const confirmDelete = confirm(`確定要移除 ${cart[index].product.name} 嗎？`);
                 if(confirmDelete) {
                     cart.splice(index, 1);
                 } else {
-                    cart[index].qty = 1; // 如果按取消，數量設回 1
+                    cart[index].qty = 1;
                 }
             }
             updateCart();
         }
 
-        // 5. 更新購物車顯示 (升級版：顯示數量按鈕)
+        // 8. 更新購物車 (跟之前一樣)
         function updateCart() {
             const cartEl = document.getElementById('cart-items');
             const totalEl = document.getElementById('total-price');
@@ -150,27 +232,22 @@
                         <div class="text-gray-800 font-medium">${item.product.name}</div>
                         <div class="text-xs text-gray-500">單價 $${item.product.price}</div>
                     </div>
-                    
                     <div class="flex items-center space-x-2">
                         <button onclick="changeQty(${index}, -1)" class="bg-gray-200 w-6 h-6 rounded text-gray-600 hover:bg-gray-300 font-bold flex items-center justify-center">-</button>
-                        
                         <span class="w-6 text-center font-bold text-sm">${item.qty}</span>
-                        
                         <button onclick="changeQty(${index}, 1)" class="bg-gray-200 w-6 h-6 rounded text-gray-600 hover:bg-gray-300 font-bold flex items-center justify-center">+</button>
                     </div>
-
                     <div class="ml-4 font-bold text-blue-600 w-16 text-right">
                         $${item.product.price * item.qty}
                     </div>
                 </div>
             `).join('');
 
-            // 計算總金額 (單價 * 數量)
             const total = cart.reduce((sum, item) => sum + (item.product.price * item.qty), 0);
             totalEl.innerText = '$' + total;
         }
 
-        // 6. 送出表單 (LINE 格式也配合數量修改)
+        // 9. 送出表單 (LINE ID 記得改)
         document.getElementById('order-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -192,7 +269,6 @@
             message += `訂購商品：\n`;
             
             cart.forEach(item => {
-                // 訊息格式： 商品名稱 x 3 ($總價)
                 message += `● ${item.product.name} x ${item.qty} ($${item.product.price * item.qty})\n`;
             });
 
@@ -202,7 +278,7 @@
                 message += `備註：${note}`;
             }
 
-            // ★★★ 請記得修改這裡的 ID ★★★
+            // ★★★ 請改這裡 ★★★
             const lineID = "@000obksn"; 
             const lineUrl = "https://line.me/R/oaMessage/" + lineID + "/?" + encodeURIComponent(message);
 
@@ -212,4 +288,5 @@
 </body>
 
 </html>
+
 
